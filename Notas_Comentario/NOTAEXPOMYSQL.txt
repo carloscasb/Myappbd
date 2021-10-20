@@ -1,0 +1,304 @@
+
+
+3---TELA App.js (INICIAL)
+
+import { StatusBar } from 'expo-status-bar';
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+
+
+export default function App() {
+  return (
+    <View style={styles.container}>
+      <Text>Open Amo MEU Nosso Deus
+         app!</Text>
+      <StatusBar style="auto" />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
+
+
+4--INSTALAR DEPENDENCIAS
+
+# npm install bootstrap
+# npm instal --save reactstrap react react-dom
+# npm i react-icons
+# npm i axios
+# npm install react-native-datepicker --save  ---Não INSTALEI
+
+
+5---CRIAR UMA PASTA src NO DIRETORIO RAIZ
+
+6 ---IMPORTAR BIBLIOTECAS --NA TELA App.js
+
+import axios from 'axios';
+import 'bootstrap/dist/css/bootstrap.min.css'
+import {FaPen} from 'react-icons/fa'
+
+TELA App,js FICA ASSIM:
+
+import { StatusBar } from 'expo-status-bar';
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+
+
+import axios from 'axios';
+import 'bootstrap/dist/css/bootstrap.min.css'
+import {FaPen} from 'react-icons/fa'
+
+
+export default function App() {
+  return (
+    <View style={styles.container}>
+      <Text>Open Amo MEU Nosso Deus
+         app!</Text>
+      <StatusBar style="auto" />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
+
+
+7----CRIAR UM BANCO DE DADOS (Criei o Banco de Dados (charset=utf-8, general-ci)no wamp e dentro da pasta www criei um backgroundColor
+chamado sacola com uma tabela chamada ususrios com 4 campos )
+
+
+8--CRIAR UMA PASTA EM www DO WAMP64 CHAMADA apireact e CODOFICAR API FAZENDO
+UM ARQUIVO D CONEXÃO EM PHP COM O BANCO (ARQUIVO PHP -- apireact.php) --
+ISSO NO WAMP NÃO ESQUECER
+<?php
+
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Credentials: true');
+header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Request-With');
+header('Content-Type: application/json; charset=utf-8');
+
+//Dados do BD local
+
+
+$banco = 'sacola';
+$host = 'localhost';
+$usuario = 'carlos';
+$senha = 'casb';
+
+// tratamento de ERRo
+try {
+	
+	$pdo = new PDO ("mysql:dbname=$banco;host=$host", "$usuario", "$senha" );
+}catch (Exception $e){
+	
+	echo 'Erro ao conectar Banco !!'. $e;
+}
+?>
+
+8-----TESTA CONEXÃO --localhost/apireact
+
+9-----INTEGRAR API (apireact) DO WAMP64 COM NOSSO PROJETO
+VAMOS NA TELA App.js e CODIFICAMOS. 
+App.js FICA ASSIM:
+import { StatusBar } from 'expo-status-bar';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+
+
+import axios from 'axios';
+import 'bootstrap/dist/css/bootstrap.min.css'
+import {FaPen} from 'react-icons/fa'
+
+
+ function App() {
+
+    // OS States NOS PERMITE MANIPULAR OS DADOS
+   //CRIAR UM STATE PARA LISTA GERAL
+   const [lista, setLista ] = useState([]);
+   //CRIAR UM STATE PARA USUARIOS que vai ser um nome (string) e não uma lista
+   const [nome, setNome ] = useState('');
+
+  //CRIAR UM STATE PARA EMAIL que vai ser um email (string) e não uma lista
+  const [email, setEmail ] = useState('');
+  //CRIAR UM STATE PARA SENHA que vai ser um senha (string) e não uma lista
+  const [senha, setSenha ] = useState('');
+  ///CRIAR O STATE ID PARA NO CASO PODER PASSAR  DE EDITAR OU DELETAR
+  const [id, setId ] = useState('');
+
+
+  //ASSIM QUE FOR CARREGADO A TELA CHAMA A FUNÇÃO listarDados
+  useEffect( ()=> {
+
+ //CRIAR METODO PARA LISTAR
+ listarDados ()
+    
+  })
+ 
+//VAMOS FAZER A FUNÇÃO listarDados, COMO VAI CHAMAR UMA API ela tem que ser ASYNC
+
+async function listarDados (){
+  /* CRIAR UMA CONSTATNTE CHAMADA res 
+  QUE VAI PEGAR RESULTADO LA NA API (QUE ESTA NO SERVIDOR LOCAL)
+*/
+const res = await axios.get('http://localhost/apireact/listar.php')
+//Depois que veio o resulatdo passa os dados para o setLista
+setLista(res.data);
+//Vamos exibir no console.log para testar e pq  Ainda não temos TELA para MOSTRAR
+console.log(res.data)
+}
+return (
+  <div>
+    Teste
+  </div>
+
+)
+}
+export default App;
+
+OBSERVAÇÂO ---- AINDA NÃO TEMOS O ARQUIVO listar.php LA NA API (apireact) NO WAMP64
+
+10---VAMOS CRIAR O ARQUIVO listar.php LA NA API (apireact) NO WAMP64
+<?php
+
+//INCLUIR CONECÃO
+include_once('conexao.php');
+
+//FAZER A CONSULTA
+
+// $query= $pdo->query("SELECT * from usuarios order by id desc limit $postjson[start], $postjson[limit] ");
+
+$query= $pdo->query("SELECT * from usuarios order by id desc  ");
+
+
+ // PASSAR OS DADOS RECEBIDOS NA CONSULTA PARA UMA ARRAY
+
+ $res = $query->fetchALL(PDO::FETCH_ASSOC);
+
+ for ($i=0; $i < count($res); $i++) {
+ 	foreach ($res[$i] as $key => $value) {
+ 		// code...
+ 	}
+
+
+// ESSE DADOS VAI SER REPASSADOS PARA A APLICAÇÃO
+ 	$dados[] = array (
+
+ 		'id' => $res[$i]['id'],
+ 		'nome' => $res[$i]['nome'],
+ 		'email' => $res[$i]['email'],
+ 		'senha' => $res[$i]['senha'],
+ 	
+ 	);
+ }
+
+ //CRIAR CONDIÇÃO SE ENCONTRA ALGUM REGISTRO (maior que 0) PASSA OS DADOS ($dados) AO CONTRARIO PASSA ZERO (0)
+
+ if (count($res) > 0 ){
+
+ 	$result = json_encode(array('sucess' => true, 'result'=> $dados));
+ }else{
+ 	$result = json_encode(array('sucess' => false, 'result'=> 0));
+
+ }
+
+ echo $result;
+
+ 
+
+?>
+---BOM TESTAR O listar.php (localhost/apireact)
+
+11------AGORA VAMOS SOLICITAÇÃO DESSES DADOS LA NA APLICAÇÂO App.js
+
+import { StatusBar } from 'expo-status-bar';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+
+
+import axios from 'axios';
+import 'bootstrap/dist/css/bootstrap.min.css'
+import {FaPen} from 'react-icons/fa'
+
+
+ function App() {
+
+    // OS States NOS PERMITE MANIPULAR OS DADOS
+   //CRIAR UM STATE PARA LISTA GERAL
+   const [lista, setLista ] = useState([]);
+   //CRIAR UM STATE PARA USUARIOS que vai ser um nome (string) e não uma lista
+   const [nome, setNome ] = useState('');
+
+  //CRIAR UM STATE PARA EMAIL que vai ser um email (string) e não uma lista
+  const [email, setEmail ] = useState('');
+  //CRIAR UM STATE PARA SENHA que vai ser um senha (string) e não uma lista
+  const [senha, setSenha ] = useState('');
+  ///CRIAR O STATE ID PARA NO CASO PODER PASSAR  DE EDITAR OU DELETAR
+  const [id, setId ] = useState('');
+
+
+  //ASSIM QUE FOR CARREGADO A TELA CHAMA A FUNÇÃO listarDados
+  useEffect( ()=> {
+
+ //CRIAR METODO PARA LISTAR
+ listarDados ()
+    
+  }, [])
+ 
+//VAMOS FAZER A FUNÇÃO listarDados, COMO VAI CHAMAR UMA API ela tem que ser ASYNC
+
+async function listarDados (){
+  /* CRIAR UMA CONSTATNTE CHAMADA res 
+  QUE VAI PEGAR RESULTADO LA NA API (QUE ESTA NO SERVIDOR LOCAL)
+*/
+const res = await axios.get('http://localhost/apireact/listar.php')
+//Depois que veio o resultado passa os dados para o setLista (nesse caso passa o resultode 2 paramentro, suceeso e reesult)
+setLista(res.data.result);
+//Vamos exibir no console.log para testar e pq  Ainda não temos TELA para MOSTRAR
+console.log(res.data.result)
+}
+return (
+
+  // DIV DO BROOTSTRAP, PODERIA FAZER O Sttyled. 
+  // RECEBER DADOS (lista)
+ <div className = "container">
+  <span className=""> lista de USUARIOS</span>
+<div className="col-md-6 p-2">
+
+    <ul class = "list-group">
+      
+      {lista.map(item => (
+        <li class = "list-group-item">{item.nome}</li>
+      ))}
+      
+    </ul>
+</div>
+
+ </div>
+
+
+)
+
+
+}
+export default App;
+
+
+-----OK PERFEITO
+
+
+
+
