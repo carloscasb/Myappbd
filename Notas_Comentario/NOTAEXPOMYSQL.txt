@@ -1,3 +1,16 @@
+1-INSTALAÇÃO E CONFIGURAR
+A1-  INSTALAR NODE JS ---https://nodejs.org
+A2- INSTALAR EXPO ----
+# npm install expo-cli --global
+CONFIRMA
+# npm install expo
+2-CRIAR APLICATIVO 
+# expo init meuApp
+---Deixae na opção 'Blank'
+B1- ABRIR PASTA DO PROJETO NO VISUAL CODE
+B2- RODAR o APP
+# expo star   OU
+# npm star ---USEI ESSE
 
 
 3---TELA App.js (INICIAL)
